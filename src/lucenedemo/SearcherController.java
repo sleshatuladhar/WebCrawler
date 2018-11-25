@@ -46,7 +46,7 @@ public class SearcherController extends HttpServlet {
 		
 		DB database=new DB();
 		
-		database.getLinks("http://www.mit.edu");
+		//database.getLinks("http://www.mit.edu");
 		
 		database.getLinks("https://edition.cnn.com/");
 		

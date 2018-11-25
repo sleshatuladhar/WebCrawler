@@ -105,21 +105,21 @@ public class Searcher {
 	static Query phraseQuery(String text) {
 		Analyzer analyzer = new StandardAnalyzer();
 		QueryBuilder builder = new QueryBuilder(analyzer);
-		Query query = builder.createPhraseQuery("para", text);
+		Query query = builder.createPhraseQuery("title", text);
 		return query;
 	}
 
 	static FuzzyQuery fuzzyQuery(String text) {
 		System.out.println("Using Fuzzy Query....");
 		Analyzer analyzer = new StandardAnalyzer();
-		FuzzyQuery fuzzyQuery = new FuzzyQuery(new Term("para", text));
+		FuzzyQuery fuzzyQuery = new FuzzyQuery(new Term("title", text));
 		return fuzzyQuery;
 	}
 
 
 	static void Boostedquery(String text, IndexSearcher searcher) throws IOException {
 		System.out.println("\n................Boosted Query........ ");
-		SynonymQuery query = new SynonymQuery(new Term("para", text));
+		SynonymQuery query = new SynonymQuery(new Term("title", text));
 
 		BoostQuery boostQuery = new BoostQuery(query, 2.0f);
 		TopDocs docs = searcher.search(boostQuery, 10);
