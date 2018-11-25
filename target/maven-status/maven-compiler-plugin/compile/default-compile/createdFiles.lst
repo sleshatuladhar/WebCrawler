@@ -1,0 +1,5 @@
+lucenedemo\DB.class
+lucenedemo\SearcherController.class
+lucenedemo\Crawler.class
+lucenedemo\Indexer.class
+lucenedemo\Searcher.class
