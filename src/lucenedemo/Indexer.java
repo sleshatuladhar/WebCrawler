@@ -42,7 +42,7 @@ public class Indexer {
 				document.add(new TextField("url", rs.getString("urls").toString(), Field.Store.YES));
 				document.add(new TextField("title", rs.getString("title").toString(), Field.Store.YES));
 				document.add(new TextField("head", rs.getString("head").toString(), Field.Store.YES));
-				document.add(new TextField("para", rs.getString("para").toString(), Field.Store.YES));
+				//document.add(new TextField("para", rs.getString("para").toString(), Field.Store.YES));
 				//document.add(new TextField("article", rs.getString("article").toString(), Field.Store.YES));
 				writer.addDocument(document);
 			}

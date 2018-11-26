@@ -16,6 +16,13 @@
 	border-bottom: 1px solid #333333;
 	border-left: 1px solid #CCCCCC;
 }
+
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-opacity: .5;
+  stroke-width: .5px;
+}
 </style>
 </head>
 <body>
@@ -25,12 +32,12 @@
 	<script type="text/javascript">
 
             //Width and height
-            var w = 1000;
-            var h = 500;
+            var w = 1200;
+            var h = 720;
             
             // variables for catching min and max zoom factors
-            var minZoom;
-            var maxZoom;
+           /*  var minZoom;
+            var maxZoom; */
 
             var projection = d3
             .geoEquirectangular()
@@ -44,12 +51,20 @@
                         .projection(projection);
 
 
+            //creating graticule element
+            //var graticule=d3.geo.graticule();
+            
             //Create SVG element
             var svg = d3.select("#map")
                         .append("svg")
                         .attr("width", w)
                         .attr("height", h);
 
+            /* svg.append("path")
+            .datum(graticule)
+            .attr("#map", "graticule")
+            .attr("d", path); */
+            
             var rectangle = svg.append("rect")
                         .attr("height", h).attr("width", w)
                         .attr("fill", "transparent")

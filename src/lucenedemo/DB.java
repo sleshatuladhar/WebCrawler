@@ -37,12 +37,12 @@ public class DB {
 			Elements elements = document.select("a[href]");
 			Elements heading = document.select("head");
 			//Elements article = document.select("article");
-			Elements para = document.select("p");
+			//Elements para = document.select("p");
 			System.out.println("Heading : " + heading.text());
-			System.out.println("Para : " + para.text());
+			//System.out.println("Para : " + para.text());
 			//System.out.println("Article : " + article.text());
 
-			getTitle(rootUrl, heading.text(), para.text());
+			getTitle(rootUrl, heading.text());
 			/*for(Element page:elements ) {
 				//getLinks(page.attr("abs:href"));
 				getLinks(page.absUrl("href"));
@@ -53,11 +53,11 @@ public class DB {
 
 	}
 
-	public void getTitle(String rootUrl, String head, String para) throws SQLException {
+	public void getTitle(String rootUrl, String head) throws SQLException {
 
 		Document document;
 		try {
-			String sql = "INSERT INTO record(urls,title,head,para) VALUES (?,?,?,?)";
+			String sql = "INSERT INTO record(urls,title,head) VALUES (?,?,?)";
 			Connection con = getConnection();
 			PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -73,7 +73,7 @@ public class DB {
 					stmt.setString(1, rootUrl);
 					stmt.setString(2, title.text().trim());
 					stmt.setString(3, head.trim());
-					stmt.setString(4, para.trim());
+					//stmt.setString(4, para.trim());
 					
 
 					stmt.executeUpdate();

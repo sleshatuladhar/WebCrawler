@@ -1,6 +1,15 @@
 package lucenedemo;
+
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -18,47 +27,54 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.QueryBuilder;
 
+
 public class Searcher {
 
+	private static Connection getConnection() throws ClassNotFoundException, SQLException {
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_crawler", "root", "");
+		return con;
+	}
+
+	public static void resultingTitle(String urls, String title, String head)
+			throws ClassNotFoundException, SQLException {
+		String sql = "INSERT INTO result(urls,title,head) VALUES (?,?,?)";
+		Connection con = getConnection();
+		PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+		stmt.setString(1, urls);
+		stmt.setString(2, title);
+		stmt.setString(3, head);
+
+		stmt.executeUpdate();
+	}
 	
-	/*public static void main(String[] args) {
-		System.out.println("Enter query to Search : ");
-		Scanner scanner = new Scanner(System.in);
-		String textToFind = scanner.nextLine();
-		String indexDir = "C:\\Users\\slesh\\eclipse-workspace\\WebCrawler";
+	public static List<URLList> getURLList() throws ClassNotFoundException, SQLException {
+		List<URLList> urlList = null;
 		try {
-			FSDirectory fsDirectory = FSDirectory.open(Paths.get(indexDir));
 
-			IndexReader reader = DirectoryReader.open(fsDirectory);
-			IndexSearcher searcher = new IndexSearcher(reader);
-			// Query query = phraseQuery(textToFind);
-			Query query1 = fuzzyQuery(textToFind);
+			Connection con = getConnection();
+			String sql = "SELECT * FROM result ";
+			PreparedStatement stmt = con.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
+			urlList = new ArrayList<URLList>();
+			while (rs.next()) {
+				URLList url = new URLList();
 
-			TopDocs docs = searcher.search(query1, 10);
-			if (docs.totalHits == 0)
-				System.out.println("Not found");
-			else {
-				for (ScoreDoc scoreDoc : docs.scoreDocs) {
-					System.out.println(scoreDoc.score);
-					System.out.println("Url :"+searcher.doc(scoreDoc.doc).get("url"));
-					System.out.println("Title :"+searcher.doc(scoreDoc.doc).get("title"));
-					System.out.println("Heading :"+searcher.doc(scoreDoc.doc).get("heading"));
-					System.out.println("Body :"+searcher.doc(scoreDoc.doc).get("body"));
-					System.out.println("Article :"+searcher.doc(scoreDoc.doc).get("article"));
+				url.setUrls(rs.getString("urls"));
+				url.setTitle(rs.getString("title"));
+				url.setHead(rs.getString("head"));
 
-				}
+				urlList.add(url);
+
 			}
-
-			//////////////////////////
-			Boostedquery(textToFind, searcher);
-			RegexQUery(textToFind, searcher);
-			///////////////////////////
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}*/
-	
+		return urlList;
+	}
+
 	public static boolean searchQuery(String textToFind) {
 		String indexDir = "C:\\Users\\slesh\\eclipse-workspace\\WebCrawler";
 		try {
@@ -66,41 +82,42 @@ public class Searcher {
 
 			IndexReader reader = DirectoryReader.open(fsDirectory);
 			IndexSearcher searcher = new IndexSearcher(reader);
-			 Query query = phraseQuery(textToFind);
-			//Query query1 = fuzzyQuery(textToFind);
+			Query query = phraseQuery(textToFind);
+			// Query query1 = fuzzyQuery(textToFind);
 
 			TopDocs docs = searcher.search(query, 10);
 			if (docs.totalHits == 0) {
 				System.out.println("Not found");
-			
+
 				return false;
-			}
-			else {
+			} else {
 				for (ScoreDoc scoreDoc : docs.scoreDocs) {
 					System.out.println(scoreDoc.score);
-					System.out.println("Url :"+searcher.doc(scoreDoc.doc).get("url"));
-					System.out.println("Title :"+searcher.doc(scoreDoc.doc).get("title"));
-					System.out.println("Heading :"+searcher.doc(scoreDoc.doc).get("head"));
-					System.out.println("Para :"+searcher.doc(scoreDoc.doc).get("para"));
-					//System.out.println("Article :"+searcher.doc(scoreDoc.doc).get("article"));
+					System.out.println("Url :" + searcher.doc(scoreDoc.doc).get("url"));
+					System.out.println("Title :" + searcher.doc(scoreDoc.doc).get("title"));
+					System.out.println("Heading :" + searcher.doc(scoreDoc.doc).get("head"));
+					// System.out.println("Para :"+searcher.doc(scoreDoc.doc).get("para"));
+					// System.out.println("Article :"+searcher.doc(scoreDoc.doc).get("article"));
 
-					return true;
+					resultingTitle(searcher.doc(scoreDoc.doc).get("url"), searcher.doc(scoreDoc.doc).get("title"),
+							searcher.doc(scoreDoc.doc).get("head"));
+
 				}
+
 			}
-			
-			
 
 			//////////////////////////
-			Boostedquery(textToFind, searcher);
-			RegexQUery(textToFind, searcher);
+			// Boostedquery(textToFind, searcher);
+			// RegexQUery(textToFind, searcher);
 			///////////////////////////
+
+			return true;
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
-	
 
 	static Query phraseQuery(String text) {
 		Analyzer analyzer = new StandardAnalyzer();
@@ -116,7 +133,6 @@ public class Searcher {
 		return fuzzyQuery;
 	}
 
-
 	static void Boostedquery(String text, IndexSearcher searcher) throws IOException {
 		System.out.println("\n................Boosted Query........ ");
 		SynonymQuery query = new SynonymQuery(new Term("title", text));
@@ -128,11 +144,11 @@ public class Searcher {
 		else {
 			for (ScoreDoc scoreDoc : docs.scoreDocs) {
 				System.out.println(scoreDoc.score);
-				System.out.println("Url :"+searcher.doc(scoreDoc.doc).get("url"));
-				System.out.println("Title :"+searcher.doc(scoreDoc.doc).get("title"));
-				System.out.println("Heading :"+searcher.doc(scoreDoc.doc).get("head"));
-				System.out.println("Para :"+searcher.doc(scoreDoc.doc).get("para"));
-				//System.out.println("Article :"+searcher.doc(scoreDoc.doc).get("article"));
+				System.out.println("Url :" + searcher.doc(scoreDoc.doc).get("url"));
+				System.out.println("Title :" + searcher.doc(scoreDoc.doc).get("title"));
+				System.out.println("Heading :" + searcher.doc(scoreDoc.doc).get("head"));
+				// System.out.println("Para :"+searcher.doc(scoreDoc.doc).get("para"));
+				// System.out.println("Article :"+searcher.doc(scoreDoc.doc).get("article"));
 			}
 		}
 
@@ -151,11 +167,11 @@ public class Searcher {
 		else {
 			for (ScoreDoc scoreDoc : docs.scoreDocs) {
 				System.out.println(scoreDoc.score);
-				System.out.println("Url :"+searcher.doc(scoreDoc.doc).get("url"));
-				System.out.println("Title :"+searcher.doc(scoreDoc.doc).get("title"));
-				System.out.println("Heading :"+searcher.doc(scoreDoc.doc).get("head"));
-				System.out.println("Para :"+searcher.doc(scoreDoc.doc).get("para"));
-				//System.out.println("Article :"+searcher.doc(scoreDoc.doc).get("article"));
+				System.out.println("Url :" + searcher.doc(scoreDoc.doc).get("url"));
+				System.out.println("Title :" + searcher.doc(scoreDoc.doc).get("title"));
+				System.out.println("Heading :" + searcher.doc(scoreDoc.doc).get("head"));
+				// System.out.println("Para :"+searcher.doc(scoreDoc.doc).get("para"));
+				// System.out.println("Article :"+searcher.doc(scoreDoc.doc).get("article"));
 			}
 		}
 	}
