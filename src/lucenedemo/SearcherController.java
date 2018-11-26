@@ -48,7 +48,7 @@ public class SearcherController extends HttpServlet {
 		
 		//database.getLinks("http://www.mit.edu");
 		
-		database.getLinks("https://edition.cnn.com/");
+		//database.getLinks("https://edition.cnn.com/");
 		
 		database.getLinks("http://www.bbc.com/news");
 		
