@@ -35,6 +35,15 @@ public class Searcher {
 		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_crawler", "root", "");
 		return con;
 	}
+	
+	public static void clearingDatabaseResult() throws ClassNotFoundException, SQLException {
+		String sql="DELETE from result";
+		Connection con=getConnection();
+		PreparedStatement stmt=con.prepareStatement(sql);
+		stmt.executeUpdate();
+		
+		con.close();
+	}
 
 	public static void resultingTitle(String urls, String title, String head)
 			throws ClassNotFoundException, SQLException {
@@ -47,6 +56,8 @@ public class Searcher {
 		stmt.setString(3, head);
 
 		stmt.executeUpdate();
+		
+		con.close();
 	}
 	
 	public static List<URLList> getURLList() throws ClassNotFoundException, SQLException {
@@ -68,6 +79,7 @@ public class Searcher {
 				urlList.add(url);
 
 			}
+			con.close();
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -75,8 +87,9 @@ public class Searcher {
 		return urlList;
 	}
 
-	public static boolean searchQuery(String textToFind) {
+	public static boolean searchQuery(String textToFind) throws ClassNotFoundException, SQLException {
 		String indexDir = "C:\\Users\\slesh\\eclipse-workspace\\WebCrawler";
+		//clearingDatabase();
 		try {
 			FSDirectory fsDirectory = FSDirectory.open(Paths.get(indexDir));
 

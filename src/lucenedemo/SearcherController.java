@@ -44,6 +44,15 @@ public class SearcherController extends HttpServlet {
 		String name=request.getParameter("search");
 		System.out.println(name);
 		
+		try {
+			DB.clearingDatabaseRecord();
+			Searcher.clearingDatabaseResult();
+		} catch (ClassNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		
 		DB database=new DB();
 		
 		//database.getLinks("http://www.mit.edu");
@@ -63,7 +72,14 @@ public class SearcherController extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		boolean searching = Searcher.searchQuery(name);
+		boolean searching;
+		try {
+			searching = Searcher.searchQuery(name);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		if (searching = true) {
 			response.sendRedirect("SearchResult.jsp");
 		} else {

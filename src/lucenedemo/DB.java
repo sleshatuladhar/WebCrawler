@@ -20,6 +20,15 @@ public class DB {
 		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_crawler", "root", "");
 		return con;
 	}
+	
+	public static void clearingDatabaseRecord() throws ClassNotFoundException, SQLException {
+		String sql="DELETE from record";
+		Connection con=getConnection();
+		PreparedStatement stmt=con.prepareStatement(sql);
+		stmt.executeUpdate();
+		
+		con.close();
+	}
 
 	HashSet<String> links = new HashSet<String>();
 	ArrayList<String> temporary = new ArrayList<String>();
@@ -80,6 +89,8 @@ public class DB {
 				}
 			}
 
+			con.close();
+			
 			System.out.println();
 
 		} catch (Exception e) {
